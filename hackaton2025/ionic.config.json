@@ -1,0 +1,7 @@
+{
+  "name": "hackaton2025",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}

@@ -1,0 +1,22 @@
+
+.marker-single {
+  width: 34px;
+  height: 34px;
+  background-image: url('https://cdn-icons-png.flaticon.com/512/2922/2922522.png'); 
+  background-size: cover;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.marker-group {
+  width: 32px;
+  height: 32px;
+  background-color: #007aff;
+  border: 3px solid white;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
