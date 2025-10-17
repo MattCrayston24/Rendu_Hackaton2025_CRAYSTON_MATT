@@ -1,16 +1,70 @@
-
-.marker-single {
-  width: 34px;
-  height: 34px;
-  background-image: url('https://cdn-icons-png.flaticon.com/512/2922/2922522.png'); 
-  background-size: cover;
-  border-radius: 50%;
-  cursor: pointer;
+.map-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
 }
 
+.popup-photo {
+  width: 180px;
+  border-radius: 8px;
+  display: block;
+  margin: 0 auto;
+}
+
+.popup-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.popup-prev,
+.popup-next {
+  background: rgba(0, 0, 0, 0.7); 
+  color: #fff; 
+  border: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: none;
+}
+
+.popup-prev:hover,
+.popup-next:hover {
+  background: rgba(0, 0, 0, 0.85); 
+}
+
+.popup-close {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #ff3b30;
+  color: #fff;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Info date */
+.photo-info {
+  margin-top: 6px;
+  font-size: 12px;
+  text-align: center;
+  color: #fff;
+}
+
+/* Marker styles */
 .marker-group {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   background-color: #007aff;
   border: 3px solid white;
   border-radius: 50%;
@@ -18,5 +72,36 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: bold;
+  color: #fff;
 }
 
+.marker-group:hover {
+  transform: scale(1.1);
+}
+
+.marker-single {
+  width: 34px;
+  height: 34px;
+  background-color: #ff3b30;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .popup-photo {
+    width: 140px;
+  }
+  .marker-group, .marker-single {
+    width: 28px;
+    height: 28px;
+  }
+  .popup-prev, .popup-next {
+    font-size: 14px;
+  }
+  .popup-close {
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+  }
+}

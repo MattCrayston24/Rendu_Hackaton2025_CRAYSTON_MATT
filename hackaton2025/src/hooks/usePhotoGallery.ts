@@ -12,7 +12,7 @@ export interface UserPhoto {
   liked?: boolean;
   lat?: number;
   lng?: number;
-  date?: string;
+  date?: string; 
   city?: string;
 }
 
@@ -34,7 +34,7 @@ export function usePhotoGallery() {
       liked: false,
       lat,
       lng,
-      date: new Date().toLocaleString(),
+      date: new Date().toISOString(), 
     };
   };
 
@@ -49,6 +49,12 @@ export function usePhotoGallery() {
           directory: Directory.Data,
         });
         photo.webviewPath = `data:image/jpeg;base64,${file.data}`;
+
+        if (photo.date) {
+          photo.date = new Date(photo.date).toISOString();
+        } else {
+          photo.date = new Date().toISOString();
+        }
       }
 
       setPhotos(savedPhotos);

@@ -45,6 +45,7 @@ import '@ionic/react/css/palettes/dark.system.css';
 /* Theme variables */
 import './theme/variables.css';
 import { map } from 'ionicons/icons';
+import { heart } from 'ionicons/icons';
 
 
 setupIonicReact();
@@ -78,8 +79,8 @@ const App: React.FC = () => (
           </IonTabButton>
 
           <IonTabButton tab="tab3" href="/tab3">
-            <IonIcon aria-hidden="true" icon={square} />
-            <IonLabel>Tab 3</IonLabel>
+            <IonIcon icon={heart} />
+            <IonLabel>Photos Likées</IonLabel>
           </IonTabButton>
         </IonTabBar>
       </IonTabs>

@@ -1,108 +1,118 @@
-import { IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, useIonViewDidEnter } from '@ionic/react';
 import mapboxgl from 'mapbox-gl';
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { usePhotoGallery, UserPhoto } from '../hooks/usePhotoGallery';
 import './Tab2.css';
-import "mapbox-gl/dist/mapbox-gl.css";
+import 'mapbox-gl/dist/mapbox-gl.css';
 
-const MAPBOX_TOKEN = 'pk.eyJ1IjoibWNyYXlzdG9uIiwiYSI6ImNtZ3Q2N3dqbjAweGgyanMxc2tkeXFkc2wifQ.exdB7OyM7A4ieHiGrKwebw';
+const MAPBOX_TOKEN = 'pk.eyJ1IjoiaGdycyIsImEiOiJjbWd0NjRiMG4wMHpzMmtxa2J6Z3ZmZDU2In0.DMtbtG-18hAPyVn6gon5xw';
 mapboxgl.accessToken = MAPBOX_TOKEN;
 
 const Tab2: React.FC = () => {
   const mapContainer = useRef<HTMLDivElement | null>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const { photos } = usePhotoGallery();
   const markersRef = useRef<mapboxgl.Marker[]>([]);
+  const { photos } = usePhotoGallery();
 
-  useEffect(() => {
-    if (!mapContainer.current) return;
+  useIonViewDidEnter(() => {
+    if (!mapContainer.current || map.current) return;
 
-    if (!map.current) {
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current!,
-        style: 'mapbox://styles/mapbox/streets-v12',
-        center: [5.4474, 43.5297],
-        zoom: 12,
-      });
-      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
-    }
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/dark-v11',
+      center: [5.4474, 43.5297],
+      zoom: 10,
+    });
 
+    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    setTimeout(() => map.current?.resize(), 200);
+
+    updateMarkers();
+  });
+
+  const updateMarkers = () => {
+    if (!map.current) return;
     const currentMap = map.current;
 
     markersRef.current.forEach(m => m.remove());
     markersRef.current = [];
 
-    const groupedPhotos: Record<string, UserPhoto[]> = {};
+    const grouped: Record<string, UserPhoto[]> = {};
     photos.forEach(photo => {
       if (photo.lat !== undefined && photo.lng !== undefined) {
-        const key = `${photo.lat.toFixed(5)}-${photo.lng.toFixed(5)}`; // arrondi pour éviter les micro-variations GPS
-        if (!groupedPhotos[key]) groupedPhotos[key] = [];
-        groupedPhotos[key].push(photo);
+        const key = `${photo.lat.toFixed(5)}-${photo.lng.toFixed(5)}`;
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(photo);
       }
     });
 
-    Object.keys(groupedPhotos).forEach(key => {
-      const group = groupedPhotos[key];
+    Object.values(grouped).forEach(group => {
       const { lat, lng } = group[0];
 
-      let popupHTML = '';
-      if (group.length > 1) {
-        const imagesHTML = group
-          .map((p, i) =>
-            `<img src="${p.webviewPath}" class="carousel-image" style="display:${i === 0 ? 'block' : 'none'};width:180px;border-radius:8px;"/>`
-          )
-          .join('');
+      const isGroup = group.length > 1;
 
-        popupHTML = `
-          <div style="text-align:center;position:relative;width:190px;">
-            ${imagesHTML}
-            <button class="carousel-btn prev-btn" style="position:absolute;left:0;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);color:#fff;border:none;font-size:18px;padding:4px 8px;border-radius:4px;">⟨</button>
-            <button class="carousel-btn next-btn" style="position:absolute;right:0;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.5);color:#fff;border:none;font-size:18px;padding:4px 8px;border-radius:4px;">⟩</button>
-            <div class="carousel-dots" style="margin-top:5px;">
-              ${group.map((_, i) => `<span class="dot" style="height:8px;width:8px;margin:2px;background:${i===0?'#333':'#bbb'};border-radius:50%;display:inline-block;"></span>`).join('')}
-            </div>
-          </div>
-        `;
+      // Marker element
+      let marker: mapboxgl.Marker;
+      if (isGroup) {
+        const el = document.createElement('div');
+        el.className = 'marker-group';
+        el.textContent = `${group.length}`;
+        marker = new mapboxgl.Marker({ element: el }).setLngLat([lng!, lat!]).addTo(currentMap);
       } else {
-        popupHTML = `<img src="${group[0].webviewPath}" width="150" style="border-radius:8px;"/>`;
+        // Epingle rouge pour une seule photo
+        marker = new mapboxgl.Marker({ color: '#ff3b30' }).setLngLat([lng!, lat!]).addTo(currentMap);
       }
 
-      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(popupHTML);
-      const marker = new mapboxgl.Marker()
-        .setLngLat([lng!, lat!])
-        .setPopup(popup)
-        .addTo(currentMap);
+      // Popup
+      const popup = new mapboxgl.Popup({ offset: 25 });
+      const popupEl = document.createElement('div');
+      popupEl.className = 'popup-container';
 
+      const closeBtn = document.createElement('button');
+      closeBtn.className = 'popup-close';
+      closeBtn.innerHTML = '✖';
+      closeBtn.onclick = () => popup.remove();
+      popupEl.appendChild(closeBtn);
+
+      const imgEl = document.createElement('img');
+      imgEl.src = group[0].webviewPath || '';
+      imgEl.className = 'popup-photo';
+      popupEl.appendChild(imgEl);
+
+      const info = document.createElement('div');
+      info.className = 'photo-info';
+      info.textContent = group[0].date ? new Date(group[0].date).toLocaleString() : '';
+      popupEl.appendChild(info);
+
+      if (isGroup) {
+        const controls = document.createElement('div');
+        controls.className = 'popup-controls';
+        const prev = document.createElement('button');
+        prev.className = 'popup-prev';
+        prev.textContent = '◀';
+        const next = document.createElement('button');
+        next.className = 'popup-next';
+        next.textContent = '▶';
+        controls.appendChild(prev);
+        controls.appendChild(next);
+        popupEl.appendChild(controls);
+
+        let idx = 0;
+        const showImage = (i: number) => {
+          imgEl.src = group[i].webviewPath || '';
+          info.textContent = group[i].date ? new Date(group[i].date).toLocaleString() : '';
+        };
+        prev.onclick = () => { idx = (idx - 1 + group.length) % group.length; showImage(idx); };
+        next.onclick = () => { idx = (idx + 1) % group.length; showImage(idx); };
+      }
+
+      popup.setDOMContent(popupEl);
+      marker.setPopup(popup);
       markersRef.current.push(marker);
-
-      marker.getElement().addEventListener('click', () => {
-        setTimeout(() => {
-          const images = document.querySelectorAll<HTMLImageElement>('.carousel-image');
-          const dots = document.querySelectorAll<HTMLElement>('.dot');
-          let currentIndex = 0;
-
-          const showImage = (index: number) => {
-            images.forEach((img, i) => (img.style.display = i === index ? 'block' : 'none'));
-            dots.forEach((dot, i) => (dot.style.background = i === index ? '#333' : '#bbb'));
-          };
-
-          document.querySelector('.prev-btn')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            currentIndex = (currentIndex - 1 + images.length) % images.length;
-            showImage(currentIndex);
-          });
-
-          document.querySelector('.next-btn')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            currentIndex = (currentIndex + 1) % images.length;
-            showImage(currentIndex);
-          });
-        }, 150);
-      });
     });
+  };
 
-    currentMap.resize();
-  }, [photos]);
+  if (map.current) updateMarkers();
 
   return (
     <IonPage>
@@ -112,15 +122,16 @@ const Tab2: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <div
-        ref={mapContainer}
-        style={{
-          position: 'absolute',
-          top: 0,
-          bottom: 0,
-          width: '100%',
-        }}
-      />
+      <IonContent fullscreen>
+        <div
+          ref={mapContainer}
+          style={{
+            width: '100%',
+            height: '100%',
+            minHeight: '100vh',
+          }}
+        />
+      </IonContent>
     </IonPage>
   );
 };

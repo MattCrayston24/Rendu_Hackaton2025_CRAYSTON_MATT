@@ -1,4 +1,4 @@
-import { camera, trash, heart, close } from 'ionicons/icons';
+import { camera, trash, heart, close, chevronBack, chevronForward } from 'ionicons/icons';
 import {
   IonContent,
   IonHeader,
@@ -21,11 +21,24 @@ import { useState } from 'react';
 
 const Tab1: React.FC = () => {
   const { photos, takePhoto, deletePhoto, toggleLike } = usePhotoGallery();
-  const [selectedPhoto, setSelectedPhoto] = useState<UserPhoto | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
+  const selectedPhoto = selectedIndex !== null ? photos[selectedIndex] : null;
 
   const handleLike = (photo: UserPhoto) => {
     toggleLike(photo);
-    setSelectedPhoto({ ...photo, liked: !photo.liked });
+  };
+
+  const nextPhoto = () => {
+    if (selectedIndex !== null && selectedIndex < photos.length - 1) {
+      setSelectedIndex(selectedIndex + 1);
+    }
+  };
+
+  const prevPhoto = () => {
+    if (selectedIndex !== null && selectedIndex > 0) {
+      setSelectedIndex(selectedIndex - 1);
+    }
   };
 
   return (
@@ -37,32 +50,33 @@ const Tab1: React.FC = () => {
       </IonHeader>
 
       <IonContent className="ion-padding">
-        <IonGrid>
+        <IonGrid className="photo-grid">
           <IonRow>
-            {photos.map((photo) => (
-              <IonCol size="6" key={photo.filepath}>
+            {photos.map((photo, index) => (
+              <IonCol
+                size="6"
+                className={`photo-col ${photos.length === 1 ? 'single-photo' : ''}`}
+                key={photo.filepath}
+              >
                 <IonImg
                   src={photo.webviewPath}
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => setSelectedPhoto(photo)}
+                  className={`photo-img ${photos.length === 1 ? 'single-photo' : ''}`}
+                  onClick={() => setSelectedIndex(index)}
                 />
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
+                <div className="photo-actions">
                   <IonButton
                     fill="solid"
                     color={photo.liked ? 'danger' : 'light'}
-                    expand="block"
                     onClick={() => toggleLike(photo)}
-                    style={{ flex: 1, marginRight: '0.25rem' }}
                   >
                     <IonIcon icon={heart} slot="icon-only" />
                   </IonButton>
 
                   <IonButton
                     color="danger"
-                    expand="block"
+                    fill="solid"
                     onClick={() => deletePhoto(photo)}
-                    style={{ flex: 1, marginLeft: '0.25rem' }}
                   >
                     <IonIcon icon={trash} slot="icon-only" />
                   </IonButton>
@@ -73,88 +87,71 @@ const Tab1: React.FC = () => {
         </IonGrid>
 
         <IonFab vertical="bottom" horizontal="center" slot="fixed">
-          <IonFabButton onClick={() => takePhoto()}>
-            <IonIcon icon={camera}></IonIcon>
+          <IonFabButton className="fab-camera" onClick={() => takePhoto()}>
+            <IonIcon icon={camera} />
           </IonFabButton>
         </IonFab>
 
-        <IonModal isOpen={!!selectedPhoto} onDidDismiss={() => setSelectedPhoto(null)}>
-          <IonContent
-            style={{
-              backgroundColor: selectedPhoto?.liked ? '#7a0000' : 'black',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              position: 'relative'
-            }}
-          >
-            <IonButton
-              fill="clear"
-              color="light"
-              onClick={() => setSelectedPhoto(null)}
-              style={{ position: 'absolute', top: '1rem', right: '1rem', zIndex: 10 }}
-            >
-              <IonIcon icon={close} slot="icon-only" />
+        <IonModal isOpen={selectedIndex !== null} onDidDismiss={() => setSelectedIndex(null)}>
+          <IonContent className={`photo-modal-content ${selectedPhoto?.liked ? 'liked' : ''}`}>
+            {/* Bouton fermer */}
+            <IonButton className="photo-modal-close" fill="clear" onClick={() => setSelectedIndex(null)}>
+              <IonIcon icon={close} />
             </IonButton>
+
+            {/* Flèche gauche */}
+            {selectedIndex !== null && selectedIndex > 0 && (
+              <IonButton className="photo-arrow left" fill="clear" onClick={prevPhoto}>
+                <IonIcon icon={chevronBack} />
+              </IonButton>
+            )}
+
+            {/* Flèche droite */}
+            {selectedIndex !== null && selectedIndex < photos.length - 1 && (
+              <IonButton className="photo-arrow right" fill="clear" onClick={nextPhoto}>
+                <IonIcon icon={chevronForward} />
+              </IonButton>
+            )}
 
             {selectedPhoto && (
               <>
                 <img
                   src={selectedPhoto.webviewPath}
+                  className="photo-modal-img-no-radius"
                   alt="Photo agrandie"
-                  style={{ width: '100%', height: 'auto', objectFit: 'contain' }}
                 />
 
-                {/* Affichage des infos sur une seule ligne avec fond noir */}
-                <div style={{
-                  position: 'absolute',
-                  left: '2rem',
-                  bottom: '2rem',
-                  color: 'white',
-                  display: 'flex',
-                  gap: '1rem',
-                  flexWrap: 'wrap',
-                  backgroundColor: 'rgba(0,0,0,0.6)',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '0.5rem'
-                }}>
-                  <span>Date: {selectedPhoto.date || 'Inconnue'}</span>
+                <div className="photo-info-line">
+                  <span>Date : {selectedPhoto.date || 'Inconnue'}</span>
                   {selectedPhoto.lat !== undefined && selectedPhoto.lng !== undefined ? (
                     <>
-                      <span>Latitude: {selectedPhoto.lat.toFixed(5)}</span>
-                      <span>Longitude: {selectedPhoto.lng.toFixed(5)}</span>
+                      <span>Lat : {selectedPhoto.lat.toFixed(5)}</span>
+                      <span>Lng : {selectedPhoto.lng.toFixed(5)}</span>
                     </>
                   ) : (
                     <span>Coordonnées non disponibles</span>
                   )}
-                  {selectedPhoto.city && <span>Ville: {selectedPhoto.city}</span>}
+                  {selectedPhoto.city && <span>Ville : {selectedPhoto.city}</span>}
                 </div>
 
-                <div style={{
-                  position: 'absolute',
-                  left: '2rem',
-                  bottom: '6rem',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  gap: '1rem'
-                }}>
+                <div className="photo-modal-actions">
                   <IonButton
-                    fill="solid"
+                    fill="clear"
                     color={selectedPhoto.liked ? 'danger' : 'light'}
                     onClick={() => handleLike(selectedPhoto)}
                   >
-                    <IonIcon icon={heart} slot="icon-only" />
+                    <IonIcon icon={heart} />
                   </IonButton>
 
                   <IonButton
+                    fill="clear"
                     color="danger"
-                    fill="solid"
                     onClick={() => {
                       deletePhoto(selectedPhoto);
-                      setSelectedPhoto(null);
+                      setSelectedIndex(null);
                     }}
                   >
-                    <IonIcon icon={trash} slot="icon-only" />
+                    <IonIcon icon={trash} />
                   </IonButton>
                 </div>
               </>

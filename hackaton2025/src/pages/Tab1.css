@@ -1,0 +1,163 @@
+/* -------------------- GRID PHOTOS -------------------- */
+.photo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.photo-col {
+  flex: 0 0 48%;
+  display: flex;
+  flex-direction: column;
+}
+
+.photo-col.single-photo {
+  flex: 0 0 90%;
+}
+
+.photo-img {
+  cursor: pointer;
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.photo-img.single-photo {
+  height: auto;
+  max-height: 80vh;
+}
+
+.photo-img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* -------------------- ACTIONS SOUS CHAQUE PHOTO -------------------- */
+.photo-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+}
+
+.photo-actions ion-button {
+  flex: 1;
+  border-radius: 8px;
+}
+
+.photo-actions ion-button:first-child {
+  margin-right: 0.25rem;
+}
+
+.photo-actions ion-button:last-child {
+  margin-left: 0.25rem;
+}
+
+/* -------------------- CAMERA BUTTON -------------------- */
+.fab-camera {
+  bottom: 1.5rem;
+  --background: #222;
+  --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* -------------------- MODAL -------------------- */
+.photo-modal-content {
+  background-color: #000;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.photo-modal-content.liked {
+  background-color: #7a0000;
+}
+
+/* -------------------- IMAGE ZOOMÉE -------------------- */
+.photo-modal-img-no-radius {
+  max-width: 95vw;
+  max-height: 85vh;
+  object-fit: contain;
+  display: block;
+  margin: auto;
+}
+
+/* -------------------- BOUTONS FERMER ET FLECHES -------------------- */
+.photo-modal-close,
+.photo-arrow {
+  position: absolute;
+  color: #fff;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  font-size: 2rem;
+  z-index: 999;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+}
+
+.photo-modal-close:hover,
+.photo-arrow:hover {
+  transform: scale(1.15);
+}
+
+.photo-modal-close {
+  top: 1.5rem;
+  right: 1.5rem;
+}
+
+.photo-arrow.left {
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.photo-arrow.right {
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+/* -------------------- INFOS SOUS L’IMAGE -------------------- */
+.photo-info-line {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fff;
+  display: flex;
+  gap: 1.2rem;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 0.8rem 1.2rem;
+  border-radius: 10px;
+  font-size: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* -------------------- BOUTONS LIKE / DELETE -------------------- */
+.photo-modal-actions {
+  position: absolute;
+  bottom: 10rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 1rem;
+}
+
+.photo-modal-actions ion-button {
+  width: 125px; 
+  height: 35px; 
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  --background: none;
+  --color: #fff;
+  --box-shadow: none;
+}

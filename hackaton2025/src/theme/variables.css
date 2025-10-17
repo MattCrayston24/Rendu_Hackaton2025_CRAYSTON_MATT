@@ -1,2 +1,44 @@
 /* For information on how to create your own theme, please see:
 http://ionicframework.com/docs/theming/ */
+/* App.css ou variables.css */
+
+/* Fond global noir */
+body, html, ion-app, ion-content, ion-page {
+  background-color: #000 !important;
+  color: #fff !important;
+}
+
+/* Texte par défaut blanc */
+ion-label, p, span, h1, h2, h3, h4, h5, h6, a, button {
+  color: #fff !important;
+}
+
+/* Boutons Ionic par défaut */
+ion-button {
+  --background: #222 !important;
+  --color: #fff !important;
+}
+
+/* Input / textarea */
+ion-input, ion-textarea {
+  --background: #111 !important;
+  --color: #fff !important;
+  border: 1px solid #444;
+}
+
+/* Headers / Toolbar */
+ion-toolbar {
+  --background: #111 !important;
+  --color: #fff !important;
+}
+
+/* TabBar */
+ion-tab-bar {
+  --background: #111 !important;
+  --color: #fff !important;
+}
+
+/* Tab icons */
+ion-tab-button ion-icon {
+  color: #fff !important;
+}
